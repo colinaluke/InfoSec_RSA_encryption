@@ -1,0 +1,105 @@
+<html>
+    <head>
+        <script>
+// These are just functions I found 
+// online to handle big numbers when doing exponents
+// SKIP TO THE ENCRYPTION PART
+const handleBigInverse = x => {
+const stringX = x.toString();
+
+if (stringX.length > 21) {
+    const approximate = Number(stringX.slice(0, 21));
+    const e = stringX.length - 21;
+
+    const inverse = 1 / approximate;
+    const inverseString = inverse.toString();
+
+    const splitString = inverseString.split("e");
+    splitString[1] = (Number(splitString[1]) - e).toString();
+
+    return splitString.join("e");
+} else {
+    const inverse = 1 / Number(x);
+    return inverse.toString();
+}
+};
+
+const expSqMod = (x, n, mod) => {
+let bigX = BigInt(x);
+let bigN = BigInt(n);
+
+if (n < 0) {
+    if (!mod || Math.abs(mod) >= 1) {
+    return handleBigInverse(expSqMod(x, -n));
+    } else {
+    return (
+        handleBigInverse(expSqMod(x, -n)) % mod
+    ).toString();
+    }
+}
+if (mod) {
+    const bigMod = BigInt(mod);
+    let result = BigInt(1);
+
+    while (bigN > 0) {
+    if (bigN % BigInt(2) == 1) {
+        result = (result * bigX) % bigMod;
+    }
+    bigX = (bigX * bigX) % bigMod;
+    bigN /= BigInt(2);
+    }
+    return result;
+} else {
+    let result = BigInt(1);
+    while (bigN > 0) {
+    if (bigN % BigInt(2) == 1) {
+        result *= bigX;
+    }
+    bigX *= bigX;
+    bigN /= BigInt(2);
+    }
+    return result;
+}
+};
+// END OF FUNCTIONS
+
+// Start of encryption
+            const encryption = (p, q) => {
+                const [n, z, e, d] = [p*q, (p - 1) * (q - 1), 7, 223];
+                var [c,m,encText,decText] = [[], [], [], []];
+                // str = "ENCRYPTION";
+                str = "RASTAMAN";
+
+                console.log("Original String: " + str);
+
+                // ENCRYPTION
+                Array.prototype.map.call(str, x => {
+                    c.push(Number(expSqMod(x.charCodeAt(0), e, n)));
+                });
+
+                encText = String.fromCharCode.apply(null, c);
+                console.log(c);
+                console.log(encText);
+
+                // DECRYPTION
+                Array.prototype.map.call(c, x => {
+                    m.push(Number(expSqMod(x, d, n)));
+                });
+
+                decText = String.fromCharCode.apply(null, m);
+                console.log(m);
+                console.log(decText);
+
+                console.log("Public key is " + n + ", " + e);
+                console.log("Private key is... well, private");           
+            }
+
+            // FUNCTION CALL
+            encryption(11,13);
+        </script>
+    </head>
+
+    <body>
+        Look at console
+    </body>
+</html>
